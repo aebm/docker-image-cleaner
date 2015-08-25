@@ -20,10 +20,10 @@ HELP_IMAGES_TO_KEEP =  ('How many docker images to keep. '
 def _exit():
     logging.shutdown()
 
-def _debug_dict(name, data):
+def debug_dict(name, data):
     [logging.debug('Dict %s has: %s=%s' % (name, k, v)) for k, v in data.iteritems()]
 
-def _setup_parser(parser):
+def setup_parser(parser):
     parser.add_argument('--debug', help='debug mode', action='store_true')
     parser.add_argument('--base-url', help=HELP_DOCKER_BASE_URL, default=DEFAULT_DOCKER_BASE_URL)
     parser.add_argument('--api-version', help=HELP_DOCKER_API_VERSION, default=DEFAULT_DOCKER_API_VERSION)
@@ -31,7 +31,7 @@ def _setup_parser(parser):
     parser.add_argument('--images-to-keep', help=HELP_IMAGES_TO_KEEP, default=DEFAULT_IMAGES_TO_KEEP, type=int)
     return parser
 
-def _validate_args(args):
+def validate_args(args):
     if args.http_timeout < 0:
         raise ValueError('HTTP timeout should be 0 or bigger')
     if args.images_to_keep < 0:
@@ -39,12 +39,12 @@ def _validate_args(args):
 
 def main():
     atexit.register(func=_exit)
-    parser = _setup_parser(argparse.ArgumentParser(description='Clean old docker images'))
+    parser = setup_parser(argparse.ArgumentParser(description='Clean old docker images'))
     args = parser.parse_args()
     if args.debug:
         logging.basicConfig(level=logging.DEBUG)
-    _debug_dict(name='args', data=vars(args))
-    _validate_args(args)
+    debug_dict(name='args', data=vars(args))
+    validate_args(args)
 
 if __name__ == '__main__':
     main()
