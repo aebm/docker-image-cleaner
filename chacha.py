@@ -13,6 +13,9 @@ DOCKER_API_VERSION_HELP =  ('The version of the API the client will use. '
 DEFAULT_DOCKER_HTTP_TIMEOUT = 5
 DOCKER_HTTP_TIMEOUT_HELP =  ('The HTTP request timeout, in seconds. '
     'Defaults to %d secs') % DEFAULT_DOCKER_HTTP_TIMEOUT
+DEFAULT_IMAGES_TO_KEEP = 2
+IMAGES_TO_KEEP_HELP =  ('How many docker images to keep. '
+    'Defaults to %d images') % DEFAULT_IMAGES_TO_KEEP
 
 def _exit():
     logging.shutdown()
@@ -24,6 +27,7 @@ def main():
     parser.add_argument('--base-url', help=DOCKER_BASE_URL_HELP, default=DEFAULT_DOCKER_BASE_URL)
     parser.add_argument('--api-version', help=DOCKER_API_VERSION_HELP, default=DEFAULT_DOCKER_API_VERSION)
     parser.add_argument('--http-timeout', help=DOCKER_HTTP_TIMEOUT_HELP, default=DEFAULT_DOCKER_HTTP_TIMEOUT, type=int)
+    parser.add_argument('--images-to-keep', help=IMAGES_TO_KEEP_HELP, default=DEFAULT_IMAGES_TO_KEEP, type=int)
     args = parser.parse_args()
     if args.debug:
         logging.basicConfig(level=logging.DEBUG)
