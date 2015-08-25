@@ -3,6 +3,7 @@
 import argparse
 import atexit
 import logging
+from pprint import pformat
 
 DEFAULT_DOCKER_BASE_URL = 'unix://var/run/docker.sock'
 HELP_DOCKER_BASE_URL =  ('Refers to the protocol+hostname+port where the '
@@ -20,8 +21,8 @@ HELP_IMAGES_TO_KEEP =  ('How many docker images to keep. '
 def _exit():
     logging.shutdown()
 
-def debug_dict(name, data):
-    [logging.debug('Dict %s has: %s=%s' % (name, k, v)) for k, v in data.iteritems()]
+def debug_var(name, var):
+    logging.debug('Var %s has: %s' % (name, pformat(var)))
 
 def setup_parser(parser):
     parser.add_argument('--debug', help='debug mode', action='store_true')
@@ -43,7 +44,7 @@ def main():
     args = parser.parse_args()
     if args.debug:
         logging.basicConfig(level=logging.DEBUG)
-    debug_dict(name='args', data=vars(args))
+    debug_var(name='args', var=args)
     validate_args(args)
 
 if __name__ == '__main__':
