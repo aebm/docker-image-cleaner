@@ -31,6 +31,12 @@ def _setup_parser(parser):
     parser.add_argument('--images-to-keep', help=HELP_IMAGES_TO_KEEP, default=DEFAULT_IMAGES_TO_KEEP, type=int)
     return parser
 
+def _validate_args(args):
+    if args.http_timeout < 0:
+        raise ValueError('HTTP timeout should be 0 or bigger')
+    if args.images_to_keep < 0:
+        raise ValueError('Images to keep should be 0 or bigger')
+
 def main():
     atexit.register(func=_exit)
     parser = _setup_parser(argparse.ArgumentParser(description='Clean old docker images'))
@@ -38,6 +44,7 @@ def main():
     if args.debug:
         logging.basicConfig(level=logging.DEBUG)
     _debug_dict(name='args', data=vars(args))
+    _validate_args(args)
 
 if __name__ == '__main__':
     main()
