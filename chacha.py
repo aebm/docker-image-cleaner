@@ -20,6 +20,9 @@ HELP_IMAGES_TO_KEEP =  ('How many docker images to keep. '
 def _exit():
     logging.shutdown()
 
+def _debug_dict(name, data):
+    [logging.debug('Dict %s has: %s=%s' % (name, k, v)) for k, v in data.iteritems()]
+
 def main():
     atexit.register(func=_exit)
     parser = argparse.ArgumentParser(description='Clean old docker images')
@@ -31,6 +34,7 @@ def main():
     args = parser.parse_args()
     if args.debug:
         logging.basicConfig(level=logging.DEBUG)
+    _debug_dict(name='args', data=vars(args))
 
 if __name__ == '__main__':
     main()
