@@ -23,14 +23,17 @@ def _exit():
 def _debug_dict(name, data):
     [logging.debug('Dict %s has: %s=%s' % (name, k, v)) for k, v in data.iteritems()]
 
-def main():
-    atexit.register(func=_exit)
-    parser = argparse.ArgumentParser(description='Clean old docker images')
+def _setup_parser(parser):
     parser.add_argument('--debug', help='debug mode', action='store_true')
     parser.add_argument('--base-url', help=HELP_DOCKER_BASE_URL, default=DEFAULT_DOCKER_BASE_URL)
     parser.add_argument('--api-version', help=HELP_DOCKER_API_VERSION, default=DEFAULT_DOCKER_API_VERSION)
     parser.add_argument('--http-timeout', help=HELP_DOCKER_HTTP_TIMEOUT, default=DEFAULT_DOCKER_HTTP_TIMEOUT, type=int)
     parser.add_argument('--images-to-keep', help=HELP_IMAGES_TO_KEEP, default=DEFAULT_IMAGES_TO_KEEP, type=int)
+    return parser
+
+def main():
+    atexit.register(func=_exit)
+    parser = _setup_parser(argparse.ArgumentParser(description='Clean old docker images'))
     args = parser.parse_args()
     if args.debug:
         logging.basicConfig(level=logging.DEBUG)
