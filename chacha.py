@@ -5,16 +5,16 @@ import atexit
 import logging
 
 DEFAULT_DOCKER_BASE_URL = 'unix://var/run/docker.sock'
-DOCKER_BASE_URL_HELP =  ('Refers to the protocol+hostname+port where the '
+HELP_DOCKER_BASE_URL =  ('Refers to the protocol+hostname+port where the '
     'Docker server is hosted. Defaults to %s') % DEFAULT_DOCKER_BASE_URL
 DEFAULT_DOCKER_API_VERSION = 'auto'
-DOCKER_API_VERSION_HELP =  ('The version of the API the client will use. '
+HELP_DOCKER_API_VERSION =  ('The version of the API the client will use. '
     'Defaults to use the API version provided by the server')
 DEFAULT_DOCKER_HTTP_TIMEOUT = 5
-DOCKER_HTTP_TIMEOUT_HELP =  ('The HTTP request timeout, in seconds. '
+HELP_DOCKER_HTTP_TIMEOUT =  ('The HTTP request timeout, in seconds. '
     'Defaults to %d secs') % DEFAULT_DOCKER_HTTP_TIMEOUT
 DEFAULT_IMAGES_TO_KEEP = 2
-IMAGES_TO_KEEP_HELP =  ('How many docker images to keep. '
+HELP_IMAGES_TO_KEEP =  ('How many docker images to keep. '
     'Defaults to %d images') % DEFAULT_IMAGES_TO_KEEP
 
 def _exit():
@@ -24,10 +24,10 @@ def main():
     atexit.register(func=_exit)
     parser = argparse.ArgumentParser(description='Clean old docker images')
     parser.add_argument('--debug', help='debug mode', action='store_true')
-    parser.add_argument('--base-url', help=DOCKER_BASE_URL_HELP, default=DEFAULT_DOCKER_BASE_URL)
-    parser.add_argument('--api-version', help=DOCKER_API_VERSION_HELP, default=DEFAULT_DOCKER_API_VERSION)
-    parser.add_argument('--http-timeout', help=DOCKER_HTTP_TIMEOUT_HELP, default=DEFAULT_DOCKER_HTTP_TIMEOUT, type=int)
-    parser.add_argument('--images-to-keep', help=IMAGES_TO_KEEP_HELP, default=DEFAULT_IMAGES_TO_KEEP, type=int)
+    parser.add_argument('--base-url', help=HELP_DOCKER_BASE_URL, default=DEFAULT_DOCKER_BASE_URL)
+    parser.add_argument('--api-version', help=HELP_DOCKER_API_VERSION, default=DEFAULT_DOCKER_API_VERSION)
+    parser.add_argument('--http-timeout', help=HELP_DOCKER_HTTP_TIMEOUT, default=DEFAULT_DOCKER_HTTP_TIMEOUT, type=int)
+    parser.add_argument('--images-to-keep', help=HELP_IMAGES_TO_KEEP, default=DEFAULT_IMAGES_TO_KEEP, type=int)
     args = parser.parse_args()
     if args.debug:
         logging.basicConfig(level=logging.DEBUG)
