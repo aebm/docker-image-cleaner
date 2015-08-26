@@ -54,6 +54,22 @@ def split_by_none((non_none, none), dict_):
 def split_images(images):
     return reduce(split_by_none, images, ([], []))
 
+def remove_keys_from_dict(keys, dict_):
+    return { k: v for k, v in dict_.iteritems() if k not in keys }
+
+def add_image_to_grp_images(grp_images, image):
+    repo, _ = image[u'RepoTags'][0].split(':')
+    new_image = remove_keys_from_dict([u'RepoTags'], image)
+    new_image[u'Tags'] = [e.split(':')[-1] for e in image[u'RepoTags']]
+    if repo in grp_images:
+        grp_images[repo].append(new_image)
+    else:
+        grp_images[repo] = [new_image]
+    return grp_images
+
+def group_by_repo(images):
+    return reduce(add_image_to_grp_images, images, {})
+
 def main():
     atexit.register(func=_exit)
     parser = setup_parser(argparse.ArgumentParser(description='Clean old docker images'))
@@ -71,6 +87,9 @@ def main():
     if args.debug:
         debug_var(name='non_none_images', var=non_none_images)
         debug_var(name='none_images', var=none_images)
+    grp_images = group_by_repo(non_none_images)
+    if args.debug:
+        debug_var(name='grp_images', var=grp_images)
 
 if __name__ == '__main__':
     main()
