@@ -38,9 +38,10 @@ def setup_parser(parser):
 def validate_args(args):
     if args.http_timeout < 0:
         sys.stderr.write('HTTP timeout should be 0 or bigger\n')
+        sys.exit(1)
     if args.images_to_keep < 0:
         sys.stderr.write('Images to keep should be 0 or bigger\n')
-    sys.exit(1)
+        sys.exit(1)
 
 def main():
     atexit.register(func=_exit)
