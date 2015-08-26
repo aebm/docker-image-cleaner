@@ -22,6 +22,7 @@ HELP_IMAGES_TO_KEEP =  ('How many docker images to keep. '
     'Defaults to %d images') % DEFAULT_IMAGES_TO_KEEP
 HELP_KEEP_NONE_IMAGES =  'Keep <none> images'
 HELP_NOOP =  'Do nothing'
+HELP_VERBOSE =  'Print images to delete'
 
 def _exit():
     logging.shutdown()
@@ -37,6 +38,7 @@ def setup_parser(parser):
     parser.add_argument('--images-to-keep', help=HELP_IMAGES_TO_KEEP, default=DEFAULT_IMAGES_TO_KEEP, type=int)
     parser.add_argument('--keep-none-images', help=HELP_KEEP_NONE_IMAGES, action='store_true')
     parser.add_argument('--noop', help=HELP_NOOP, action='store_true')
+    parser.add_argument('--verbose', help=HELP_VERBOSE, action='store_true')
     return parser
 
 def validate_args(args):
@@ -84,6 +86,13 @@ def fix_none_image(image):
     new_image[u'Tags'] = image[u'RepoTags']
     return new_image
 
+def beautify_image(image):
+    return image
+
+def print_images_to_delete(repos):
+    print('Images to delete')
+    print(pformat({k: [beautify_image(e) for e in v] for k, v in repos.iteritems()}))
+
 def main():
     atexit.register(func=_exit)
     parser = setup_parser(argparse.ArgumentParser(description='Clean old docker images'))
@@ -115,6 +124,8 @@ def main():
     to_delete.update({k: v[args.images_to_keep:] for k, v in repos_w_images.iteritems()})
     if args.debug:
         debug_var(name='to_delete', var=to_delete)
+    if args.verbose:
+        print_images_to_delete(to_delete)
     if args.noop:
         sys.exit(0)
 
