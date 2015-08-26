@@ -5,6 +5,7 @@ import atexit
 import logging
 import sys
 from pprint import pformat
+from docker import Client
 
 DEFAULT_DOCKER_BASE_URL = 'unix://var/run/docker.sock'
 HELP_DOCKER_BASE_URL =  ('Refers to the protocol+hostname+port where the '
@@ -43,6 +44,16 @@ def validate_args(args):
         sys.stderr.write('Images to keep should be 0 or bigger\n')
         sys.exit(1)
 
+def split_by_none((non_none, none), dict_):
+    if u'<none>:<none>' in dict_[u'RepoTags']:
+        none.append(dict_)
+    else:
+        non_none.append(dict_)
+    return (non_none, none)
+
+def split_images(images):
+    return reduce(split_by_none, images, ([], []))
+
 def main():
     atexit.register(func=_exit)
     parser = setup_parser(argparse.ArgumentParser(description='Clean old docker images'))
@@ -52,6 +63,14 @@ def main():
     if args.debug:
         debug_var(name='args', var=args)
     validate_args(args)
+    client = Client(base_url=args.base_url, version=args.api_version, timeout=args.http_timeout)
+    images = client.images()
+    if args.debug:
+        debug_var(name='images', var=images)
+    non_none_images, none_images = split_images(images)
+    if args.debug:
+        debug_var(name='non_none_images', var=non_none_images)
+        debug_var(name='none_images', var=none_images)
 
 if __name__ == '__main__':
     main()
