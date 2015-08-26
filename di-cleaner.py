@@ -18,6 +18,7 @@ HELP_DOCKER_HTTP_TIMEOUT =  ('The HTTP request timeout, in seconds. '
 DEFAULT_IMAGES_TO_KEEP = 2
 HELP_IMAGES_TO_KEEP =  ('How many docker images to keep. '
     'Defaults to %d images') % DEFAULT_IMAGES_TO_KEEP
+HELP_KEEP_NONE_IMAGES =  'Keep <none> images'
 
 def _exit():
     logging.shutdown()
@@ -31,6 +32,7 @@ def setup_parser(parser):
     parser.add_argument('--api-version', help=HELP_DOCKER_API_VERSION, default=DEFAULT_DOCKER_API_VERSION)
     parser.add_argument('--http-timeout', help=HELP_DOCKER_HTTP_TIMEOUT, default=DEFAULT_DOCKER_HTTP_TIMEOUT, type=int)
     parser.add_argument('--images-to-keep', help=HELP_IMAGES_TO_KEEP, default=DEFAULT_IMAGES_TO_KEEP, type=int)
+    parser.add_argument('--keep-none-images', help=HELP_KEEP_NONE_IMAGES, action='store_true')
     return parser
 
 def validate_args(args):
