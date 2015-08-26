@@ -4,6 +4,7 @@ import argparse
 import atexit
 import logging
 import sys
+from datetime import datetime
 from pprint import pformat
 from operator import itemgetter
 from docker import Client
@@ -87,7 +88,9 @@ def fix_none_image(image):
     return new_image
 
 def beautify_image(image):
-    return image
+    new_image = remove_keys_from_dict([u'RepoDigests', u'ParentId', u'Labels'], image)
+    new_image[u'Created'] = datetime.fromtimestamp(image[u'Created']).isoformat(' ')
+    return new_image
 
 def print_images_to_delete(repos):
     print('Images to delete')
