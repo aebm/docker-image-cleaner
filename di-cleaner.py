@@ -77,6 +77,11 @@ def reverse_sort_images_created(images):
 def sort_images_in_repos(repos):
     return { k: reverse_sort_images_created(v) for k, v in repos.iteritems() }
 
+def fix_none_image(image):
+    new_image = remove_keys_from_dict([u'RepoTags'], image)
+    new_image[u'Tags'] = image[u'RepoTags']
+    return new_image
+
 def main():
     atexit.register(func=_exit)
     parser = setup_parser(argparse.ArgumentParser(description='Clean old docker images'))
@@ -97,6 +102,11 @@ def main():
     repos = sort_images_in_repos(group_by_repo(non_none_images))
     if args.debug:
         debug_var(name='repos', var=repos)
+    to_delete = {}
+    if not args.keep_none_images:
+        to_delete[u'<none>'] = [fix_none_image(e) for e in none_images]
+    if args.debug:
+        debug_var(name='to_delete', var=to_delete)
 
 if __name__ == '__main__':
     main()
