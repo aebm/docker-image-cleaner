@@ -48,7 +48,8 @@ def main():
     args = parser.parse_args()
     if args.debug:
         logging.basicConfig(level=logging.DEBUG)
-    debug_var(name='args', var=args)
+    if args.debug:
+        debug_var(name='args', var=args)
     validate_args(args)
 
 if __name__ == '__main__':
