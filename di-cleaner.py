@@ -3,6 +3,7 @@
 import argparse
 import atexit
 import logging
+import sys
 from pprint import pformat
 
 DEFAULT_DOCKER_BASE_URL = 'unix://var/run/docker.sock'
@@ -34,9 +35,10 @@ def setup_parser(parser):
 
 def validate_args(args):
     if args.http_timeout < 0:
-        raise ValueError('HTTP timeout should be 0 or bigger')
+        sys.stderr.write('HTTP timeout should be 0 or bigger\n')
     if args.images_to_keep < 0:
-        raise ValueError('Images to keep should be 0 or bigger')
+        sys.stderr.write('Images to keep should be 0 or bigger\n')
+    sys.exit(1)
 
 def main():
     atexit.register(func=_exit)
