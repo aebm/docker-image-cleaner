@@ -107,6 +107,12 @@ def main():
         to_delete[u'<none>'] = [fix_none_image(e) for e in none_images]
     if args.debug:
         debug_var(name='to_delete', var=to_delete)
+    repos_w_images = {k: v for k, v in repos.iteritems() if len(v) > args.images_to_keep}
+    if args.debug:
+        debug_var(name='repos_w_images', var=repos_w_images)
+    to_delete.update({k: v[args.images_to_keep:] for k, v in repos_w_images.iteritems()})
+    if args.debug:
+        debug_var(name='to_delete', var=to_delete)
 
 if __name__ == '__main__':
     main()
