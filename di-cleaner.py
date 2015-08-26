@@ -5,6 +5,7 @@ import atexit
 import logging
 import sys
 from pprint import pformat
+from operator import itemgetter
 from docker import Client
 
 DEFAULT_DOCKER_BASE_URL = 'unix://var/run/docker.sock'
@@ -70,6 +71,12 @@ def add_image_to_grp_images(grp_images, image):
 def group_by_repo(images):
     return reduce(add_image_to_grp_images, images, {})
 
+def reverse_sort_images_created(images):
+    return sorted(images, key=itemgetter(u'Created'), reverse=True)
+
+def sort_images_in_repos(repos):
+    return { k: reverse_sort_images_created(v) for k, v in repos.iteritems() }
+
 def main():
     atexit.register(func=_exit)
     parser = setup_parser(argparse.ArgumentParser(description='Clean old docker images'))
@@ -87,9 +94,9 @@ def main():
     if args.debug:
         debug_var(name='non_none_images', var=non_none_images)
         debug_var(name='none_images', var=none_images)
-    grp_images = group_by_repo(non_none_images)
+    repos = sort_images_in_repos(group_by_repo(non_none_images))
     if args.debug:
-        debug_var(name='grp_images', var=grp_images)
+        debug_var(name='repos', var=repos)
 
 if __name__ == '__main__':
     main()
