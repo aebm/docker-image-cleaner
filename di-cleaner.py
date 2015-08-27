@@ -99,6 +99,18 @@ def print_images_to_delete(repos):
     print('Images to delete')
     print(pformat({k: [beautify_image(e) for e in v] for k, v in repos.iteritems()}))
 
+def remove_docker_image(client, id_):
+    try:
+        client.remove_image(id_)
+    except Exception as e:
+        pass
+
+def clean_images_in_repo(client, images):
+    [remove_docker_image(client, image[u'Id']) for image in images]
+
+def clean_repos(client, repos):
+    [clean_images_in_repo(client, images) for images in repos.itervalues()]
+
 def main():
     atexit.register(func=_exit)
     parser = setup_parser(argparse.ArgumentParser(description='Clean old docker images'))
@@ -134,6 +146,7 @@ def main():
         print_images_to_delete(to_delete)
     if args.noop:
         sys.exit(0)
+    clean_repos(client, to_delete)
 
 if __name__ == '__main__':
     main()
