@@ -8,6 +8,7 @@ from datetime import datetime
 from pprint import pformat
 from operator import itemgetter
 from docker import Client
+from humanfriendly import format_size
 
 DEFAULT_DOCKER_BASE_URL = 'unix://var/run/docker.sock'
 HELP_DOCKER_BASE_URL =  ('Refers to the protocol+hostname+port where the '
@@ -90,6 +91,8 @@ def fix_none_image(image):
 def beautify_image(image):
     new_image = remove_keys_from_dict([u'RepoDigests', u'ParentId', u'Labels'], image)
     new_image[u'Created'] = datetime.fromtimestamp(image[u'Created']).isoformat(' ')
+    new_image[u'Size'] = format_size(image[u'Size'])
+    new_image[u'VirtualSize'] = format_size(image[u'VirtualSize'])
     return new_image
 
 def print_images_to_delete(repos):
