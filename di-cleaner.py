@@ -142,7 +142,7 @@ def print_images_to_delete(repos):
 def remove_docker_image(client, id_):
     try:
         client.remove_image(id_)
-    except Exception as e:
+    except Exception:
         pass
 
 
