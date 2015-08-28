@@ -5,6 +5,7 @@ import atexit
 import logging
 import sys
 from datetime import datetime
+from functools import reduce
 from pprint import pformat
 from operator import itemgetter
 from docker import Client
@@ -77,7 +78,7 @@ def validate_args(args):
         sys.exit(1)
 
 
-def split_by_none((non_none, none), dict_):
+def split_by_none(non_none, none, dict_):
     if u'<none>:<none>' in dict_[u'RepoTags']:
         none.append(dict_)
     else:
@@ -155,7 +156,7 @@ def clean_repos(client, repos):
 
 
 def main():
-    atexit.register(func=_exit)
+    atexit.register(_exit)
     parser = setup_parser(argparse.ArgumentParser(
         description='Clean old docker images'))
     args = parser.parse_args()
