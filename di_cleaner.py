@@ -78,12 +78,15 @@ def validate_args(args):
         sys.exit(1)
 
 
-def split_by_none(non_none, none, dict_):
+def split_by_none(images_lists, dict_):
+    if not isinstance(images_lists, tuple):
+        raise TypeError('First argument should be a tuple')
+    non_none_images, none_images = images_lists
     if u'<none>:<none>' in dict_[u'RepoTags']:
-        none.append(dict_)
+        none_images.append(dict_)
     else:
-        non_none.append(dict_)
-    return (non_none, none)
+        non_none_images.append(dict_)
+    return (non_none_images, none_images)
 
 
 def split_images(images):
