@@ -60,6 +60,13 @@ class TestDockerImageCleanerMethods(unittest.TestCase):
         self.assertEqual(len(none_images), 2,
                          msg='none_images should have two elements')
 
+    def test_remove_keys_from_dict(self):
+        dict_ = {i: i for i in range(5)}
+        target_dict = {i: i for i in range(5) if i in [1, 3]}
+        new_dict = di_cleaner.remove_keys_from_dict([0, 2, 4], dict_)
+        self.assertEqual(new_dict, target_dict,
+                         msg='Did not get expected dict')
+
 
 if __name__ == '__main__':
     unittest.main()
