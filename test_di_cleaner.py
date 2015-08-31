@@ -82,7 +82,7 @@ class TestDockerImageCleanerMethods(unittest.TestCase):
         self.assertIn(u'a', grp_images, msg='It should keep repo a')
         self.assertIn(u'b', grp_images, msg='It should have repo b')
         self.assertEqual(grp_images[u'b'], exp_b_images,
-                         msg='This is not expected')
+                         msg='This was not expected')
 
     def test_group_by_repo(self):
         images = [
