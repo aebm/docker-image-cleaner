@@ -138,6 +138,12 @@ class TestDockerImageCleanerMethods(unittest.TestCase):
         self.assertEqual(di_cleaner.sort_images_in_repos(repos), exp_repos,
                          msg='The images are in the wrong order')
 
+    def test_fix_none_image(self):
+        image = {u'Id': u'0', u'RepoTags': [u'<none>:<none>']}
+        exp_image = {u'Id': u'0', u'Tags': [u'<none>:<none>']}
+        self.assertEqual(di_cleaner.fix_none_image(image), exp_image,
+                         msg='Unexpected result')
+
 
 if __name__ == '__main__':
     unittest.main()
