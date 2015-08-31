@@ -102,7 +102,7 @@ class TestDockerImageCleanerMethods(unittest.TestCase):
         images = [
             {u'Id': '2', u'Created': 2},
             {u'Id': '1', u'Created': 1},
-            {u'Id': '3', u'Created': 3},
+            {u'Id': '3', u'Created': 3}
         ]
         exp_images = [
             {u'Id': '3', u'Created': 3},
