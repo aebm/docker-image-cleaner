@@ -84,6 +84,20 @@ class TestDockerImageCleanerMethods(unittest.TestCase):
         self.assertEqual(grp_images[u'b'], exp_b_images,
                          msg='This is not expected')
 
+    def test_group_by_repo(self):
+        images = [
+            {u'Id': u'0', u'RepoTags': [u'a:0', u'a:1']},
+            {u'Id': u'2', u'RepoTags': [u'b:0', u'b:1']},
+            {u'Id': u'1', u'RepoTags': [u'a:2', u'a:3']}
+        ]
+        exp_grouped = {u'a': [
+                {u'Id': u'0', u'Tags': [u'0', u'1']},
+                {u'Id': u'1', u'Tags': [u'2', u'3']}],
+            u'b': [
+                {u'Id': u'2', u'Tags': [u'0', u'1']}]}
+        grouped = di_cleaner.group_by_repo(images)
+        self.assertEqual(grouped, exp_grouped, msg='This was not expected')
+
 
 if __name__ == '__main__':
     unittest.main()
