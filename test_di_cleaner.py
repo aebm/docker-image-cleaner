@@ -2,6 +2,8 @@
 
 import unittest
 import di_cleaner
+from datetime import datetime
+from humanfriendly import format_size
 
 
 class TestDockerImageCleanerMethods(unittest.TestCase):
@@ -142,6 +144,26 @@ class TestDockerImageCleanerMethods(unittest.TestCase):
         image = {u'Id': u'0', u'RepoTags': [u'<none>:<none>']}
         exp_image = {u'Id': u'0', u'Tags': [u'<none>:<none>']}
         self.assertEqual(di_cleaner.fix_none_image(image), exp_image,
+                         msg='Unexpected result')
+
+    def test_beautify_image(self):
+        image = {
+            u'Id': u'1',
+            u'RepoDigests': 'digest',
+            u'ParentId': u'0',
+            u'Labels': 'labels',
+            u'Created': 1441050417,
+            u'Size': 1048576,
+            u'VirtualSize': 1024
+        }
+        exp_image = {
+            u'Id': u'1',
+            u'Created': datetime.fromtimestamp(
+                image[u'Created']).isoformat(' '),
+            u'Size': format_size(image[u'Size']),
+            u'VirtualSize': format_size(image[u'VirtualSize'])
+        }
+        self.assertEqual(di_cleaner.beautify_image(image), exp_image,
                          msg='Unexpected result')
 
 
