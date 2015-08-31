@@ -112,6 +112,32 @@ class TestDockerImageCleanerMethods(unittest.TestCase):
         self.assertEqual(di_cleaner.reverse_sort_images_created(images),
                          exp_images, msg='The images are in the wrong order')
 
+    def test_sort_images_in_repos(self):
+        repos = {
+            u'a': [
+                {u'Id': '2', u'Created': 2},
+                {u'Id': '1', u'Created': 1},
+                {u'Id': '3', u'Created': 3}
+            ],
+            u'b': [
+                {u'Id': '4', u'Created': 4},
+                {u'Id': '5', u'Created': 5}
+            ]
+        }
+        exp_repos = {
+            u'a': [
+                {u'Id': '3', u'Created': 3},
+                {u'Id': '2', u'Created': 2},
+                {u'Id': '1', u'Created': 1}
+            ],
+            u'b': [
+                {u'Id': '5', u'Created': 5},
+                {u'Id': '4', u'Created': 4}
+            ]
+        }
+        self.assertEqual(di_cleaner.sort_images_in_repos(repos), exp_repos,
+                         msg='The images are in the wrong order')
+
 
 if __name__ == '__main__':
     unittest.main()
