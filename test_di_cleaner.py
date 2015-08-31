@@ -3,6 +3,7 @@
 import unittest
 import di_cleaner
 
+
 class TestDockerImageCleanerMethods(unittest.TestCase):
 
     def test_split_by_none(self):
@@ -46,9 +47,8 @@ class TestDockerImageCleanerMethods(unittest.TestCase):
             di_cleaner.split_by_none(non_none_images, image_non_none)
         with self.assertRaises(ValueError):
             di_cleaner.split_by_none((non_none_images,), image_non_none)
-            di_cleaner.split_by_none((non_none_images, none_images, none_images),
-                                     image_non_none)
-
+            di_cleaner.split_by_none((non_none_images, none_images,
+                                      none_images), image_non_none)
 
     def test_split_images(self):
         images = [{'id': id_, u'RepoTags': u'<none>:<none>'}
