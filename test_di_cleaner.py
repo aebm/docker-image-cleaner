@@ -98,6 +98,20 @@ class TestDockerImageCleanerMethods(unittest.TestCase):
         grouped = di_cleaner.group_by_repo(images)
         self.assertEqual(grouped, exp_grouped, msg='This was not expected')
 
+    def test_reverse_sort_images_created(self):
+        images = [
+            {u'Id': '2', u'Created': 2},
+            {u'Id': '1', u'Created': 1},
+            {u'Id': '3', u'Created': 3},
+        ]
+        exp_images = [
+            {u'Id': '3', u'Created': 3},
+            {u'Id': '2', u'Created': 2},
+            {u'Id': '1', u'Created': 1}
+        ]
+        self.assertEqual(di_cleaner.reverse_sort_images_created(images),
+                         exp_images, msg='The images are in the wrong order')
+
 
 if __name__ == '__main__':
     unittest.main()
