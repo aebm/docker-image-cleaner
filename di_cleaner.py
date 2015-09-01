@@ -5,7 +5,7 @@ import atexit
 import logging
 import sys
 from datetime import datetime
-from functools import reduce
+from functools import partial, reduce
 from pprint import pformat
 from operator import itemgetter
 from docker import Client
@@ -36,8 +36,13 @@ def _exit():
     logging.shutdown()
 
 
-def debug_var(name, var):
-    logging.debug('Var %s has: %s' % (name, pformat(var)))
+def is_debug_on():
+    return logging.getLogger().getEffectiveLevel() == logging.DEBUG
+
+
+def debug_var(debug, name, var):
+    if debug:
+        logging.debug('Var %s has: %s' % (name, pformat(var)))
 
 
 def setup_parser(parser):
@@ -165,36 +170,30 @@ def main():
     args = parser.parse_args()
     if args.debug:
         logging.basicConfig(level=logging.DEBUG)
-    if args.debug:
-        debug_var(name='args', var=args)
+    debug = partial(debug_var, debug=is_debug_on())
+    debug(name='args', var=args)
     validate_args(args)
     client = Client(
         base_url=args.base_url,
         version=args.api_version,
         timeout=args.http_timeout)
     images = client.images()
-    if args.debug:
-        debug_var(name='images', var=images)
+    debug(name='images', var=images)
     non_none_images, none_images = split_images(images)
-    if args.debug:
-        debug_var(name='non_none_images', var=non_none_images)
-        debug_var(name='none_images', var=none_images)
+    debug(name='non_none_images', var=non_none_images)
+    debug(name='none_images', var=none_images)
     repos = sort_images_in_repos(group_by_repo(non_none_images))
-    if args.debug:
-        debug_var(name='repos', var=repos)
+    debug(name='repos', var=repos)
     to_delete = {}
     if not args.keep_none_images:
         to_delete[u'<none>'] = [fix_none_image(e) for e in none_images]
-    if args.debug:
-        debug_var(name='to_delete', var=to_delete)
+    debug(name='to_delete', var=to_delete)
     repos_w_images = {k: v for k, v in repos.iteritems()
                       if len(v) > args.images_to_keep}
-    if args.debug:
-        debug_var(name='repos_w_images', var=repos_w_images)
+    debug(name='repos_w_images', var=repos_w_images)
     to_delete.update({k: v[args.images_to_keep:]
                       for k, v in repos_w_images.iteritems()})
-    if args.debug:
-        debug_var(name='to_delete', var=to_delete)
+    debug(name='to_delete', var=to_delete)
     if args.verbose:
         print_images_to_delete(to_delete)
     if args.noop:
