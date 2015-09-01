@@ -105,12 +105,10 @@ def remove_keys_from_dict(keys, dict_):
 
 def add_image_to_grp_images(grp_images, image):
     repo, _ = image[u'RepoTags'][0].split(':')
-    new_image = remove_keys_from_dict([u'RepoTags'], image)
-    new_image[u'Tags'] = [e.split(':')[-1] for e in image[u'RepoTags']]
     if repo in grp_images:
-        grp_images[repo].append(new_image)
+        grp_images[repo].append(image)
     else:
-        grp_images[repo] = [new_image]
+        grp_images[repo] = [image]
     return grp_images
 
 
@@ -126,12 +124,6 @@ def sort_images_in_repos(repos):
     return {k: reverse_sort_images_created(v) for k, v in repos.iteritems()}
 
 
-def fix_none_image(image):
-    new_image = remove_keys_from_dict([u'RepoTags'], image)
-    new_image[u'Tags'] = image[u'RepoTags']
-    return new_image
-
-
 def beautify_image(image):
     new_image = remove_keys_from_dict(
         [u'RepoDigests', u'ParentId', u'Labels'],
@@ -143,25 +135,20 @@ def beautify_image(image):
     return new_image
 
 
-def print_images_to_delete(repos):
+def print_images_to_delete(images):
     print('Images to delete')
-    print(pformat({k: [beautify_image(e) for e in v]
-          for k, v in repos.iteritems()}))
+    print(pformat([beautify_image(image) for image in images]))
 
 
-def remove_docker_image(client, id_):
+def remove_docker_image(client, image_id):
     try:
-        client.remove_image(id_)
+        client.remove_image(image_id)
     except Exception:
         pass
 
 
-def clean_images_in_repo(client, images):
+def delete_images(client, images):
     [remove_docker_image(client, image[u'Id']) for image in images]
-
-
-def clean_repos(client, repos):
-    [clean_images_in_repo(client, images) for images in repos.itervalues()]
 
 
 def main():
@@ -183,23 +170,21 @@ def main():
     non_none_images, none_images = split_images(images)
     debug(name='non_none_images', var=non_none_images)
     debug(name='none_images', var=none_images)
+    images_to_delete = []
+    if not args.keep_none_images:
+        images_to_delete.extend(none_images)
+    debug(name='images_to_delete', var=images_to_delete)
     repos = sort_images_in_repos(group_by_repo(non_none_images))
     debug(name='repos', var=repos)
-    to_delete = {}
-    if not args.keep_none_images:
-        to_delete[u'<none>'] = [fix_none_image(e) for e in none_images]
-    debug(name='to_delete', var=to_delete)
-    repos_w_images = {k: v for k, v in repos.iteritems()
-                      if len(v) > args.images_to_keep}
-    debug(name='repos_w_images', var=repos_w_images)
-    to_delete.update({k: v[args.images_to_keep:]
-                      for k, v in repos_w_images.iteritems()})
-    debug(name='to_delete', var=to_delete)
+    [images_to_delete.extend(repo_images[args.images_to_keep:])
+     for repo_images in repos.itervalues()
+     if len(repo_images) > args.images_to_keep]
+    debug(name='images_to_delete', var=images_to_delete)
     if args.verbose:
-        print_images_to_delete(to_delete)
+        print_images_to_delete(images_to_delete)
     if args.noop:
         sys.exit(0)
-    clean_repos(client, to_delete)
+    delete_images(client, images_to_delete)
 
 if __name__ == '__main__':
     main()

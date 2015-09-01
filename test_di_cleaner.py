@@ -70,12 +70,12 @@ class TestDockerImageCleanerMethods(unittest.TestCase):
                          msg='Did not get expected dict')
 
     def test_add_image_to_grp_images(self):
-        grp_images = {u'a': [{u'Id': u'0', u'Tags': [u'0', u'1']}]}
+        grp_images = {u'a': [{u'Id': u'0', u'RepoTags': [u'a:0', u'a:1']}]}
         image_1 = {u'Id': u'1', u'RepoTags': [u'a:2', u'a:3']}
         image_2 = {u'Id': u'2', u'RepoTags': [u'b:0', u'b:1']}
-        exp_a_images = [{u'Id': u'0', u'Tags': [u'0', u'1']},
-                        {u'Id': u'1', u'Tags': [u'2', u'3']}]
-        exp_b_images = [{u'Id': u'2', u'Tags': [u'0', u'1']}]
+        exp_a_images = [{u'Id': u'0', u'RepoTags': [u'a:0', u'a:1']},
+                        image_1]
+        exp_b_images = [image_2]
         grp_images = di_cleaner.add_image_to_grp_images(grp_images, image_1)
         self.assertIn(u'a', grp_images, msg='It should not remove repos')
         self.assertEqual(grp_images[u'a'], exp_a_images,
@@ -93,10 +93,10 @@ class TestDockerImageCleanerMethods(unittest.TestCase):
             {u'Id': u'1', u'RepoTags': [u'a:2', u'a:3']}
         ]
         exp_grouped = {u'a': [
-                {u'Id': u'0', u'Tags': [u'0', u'1']},
-                {u'Id': u'1', u'Tags': [u'2', u'3']}],
+                {u'Id': u'0', u'RepoTags': [u'a:0', u'a:1']},
+                {u'Id': u'1', u'RepoTags': [u'a:2', u'a:3']}],
             u'b': [
-                {u'Id': u'2', u'Tags': [u'0', u'1']}]}
+                {u'Id': u'2', u'RepoTags': [u'b:0', u'b:1']}]}
         grouped = di_cleaner.group_by_repo(images)
         self.assertEqual(grouped, exp_grouped, msg='This was not expected')
 
@@ -139,12 +139,6 @@ class TestDockerImageCleanerMethods(unittest.TestCase):
         }
         self.assertEqual(di_cleaner.sort_images_in_repos(repos), exp_repos,
                          msg='The images are in the wrong order')
-
-    def test_fix_none_image(self):
-        image = {u'Id': u'0', u'RepoTags': [u'<none>:<none>']}
-        exp_image = {u'Id': u'0', u'Tags': [u'<none>:<none>']}
-        self.assertEqual(di_cleaner.fix_none_image(image), exp_image,
-                         msg='Unexpected result')
 
     def test_beautify_image(self):
         image = {
