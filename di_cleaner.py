@@ -75,11 +75,12 @@ def setup_parser(parser):
 
 
 def validate_args(args):
-    if args.http_timeout < 0:
-        sys.stderr.write('HTTP timeout should be 0 or bigger\n')
-        sys.exit(1)
-    if args.images_to_keep < 0:
-        sys.stderr.write('Images to keep should be 0 or bigger\n')
+    checks = [
+        (lambda args: args.http_timeout < 0,
+         'HTTP timeout should be 0 or bigger\n'),
+        (lambda args: args.images_to_keep < 0,
+         'Images to keep should be 0 or bigger\n')]
+    if [sys.stderr.write(msg) for checker, msg in checks if checker(args)]:
         sys.exit(1)
 
 
