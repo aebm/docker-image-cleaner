@@ -140,15 +140,16 @@ def print_images_to_delete(images):
     print(pformat([beautify_image(image) for image in images]))
 
 
-def remove_docker_image(client, image_id):
+def remove_docker_image(client, image_id, verbose):
     try:
         client.remove_image(image_id)
-    except Exception:
-        pass
+    except Exception as e:
+        if verbose:
+            print(e.explanation)
 
 
-def delete_images(client, images):
-    [remove_docker_image(client, image[u'Id']) for image in images]
+def delete_images(client, images, verbose):
+    [remove_docker_image(client, image[u'Id'], verbose) for image in images]
 
 
 def main():
@@ -184,7 +185,7 @@ def main():
         print_images_to_delete(images_to_delete)
     if args.noop:
         sys.exit(0)
-    delete_images(client, images_to_delete)
+    delete_images(client, images_to_delete, args.verbose)
 
 if __name__ == '__main__':
     main()
