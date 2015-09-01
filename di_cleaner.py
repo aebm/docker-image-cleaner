@@ -152,6 +152,16 @@ def delete_images(client, images, verbose):
     [remove_docker_image(client, image[u'Id'], verbose) for image in images]
 
 
+def get_images_to_delete(none_images, repos, num_images_to_keep, keep_nones):
+    images_to_delete = []
+    if not keep_nones:
+        images_to_delete.extend(none_images)
+    [images_to_delete.extend(repo_images[num_images_to_keep:])
+     for repo_images in repos.itervalues()
+     if len(repo_images) > num_images_to_keep]
+    return images_to_delete
+
+
 def main():
     atexit.register(_exit)
     parser = setup_parser(argparse.ArgumentParser(
@@ -171,15 +181,10 @@ def main():
     non_none_images, none_images = split_images(images)
     debug(name='non_none_images', var=non_none_images)
     debug(name='none_images', var=none_images)
-    images_to_delete = []
-    if not args.keep_none_images:
-        images_to_delete.extend(none_images)
-    debug(name='images_to_delete', var=images_to_delete)
     repos = sort_images_in_repos(group_by_repo(non_none_images))
     debug(name='repos', var=repos)
-    [images_to_delete.extend(repo_images[args.images_to_keep:])
-     for repo_images in repos.itervalues()
-     if len(repo_images) > args.images_to_keep]
+    images_to_delete = get_images_to_delete(
+        none_images, repos, args.images_to_keep, args.keep_none_images)
     debug(name='images_to_delete', var=images_to_delete)
     if args.verbose:
         print_images_to_delete(images_to_delete)

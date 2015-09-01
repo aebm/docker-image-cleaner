@@ -160,6 +160,30 @@ class TestDockerImageCleanerMethods(unittest.TestCase):
         self.assertEqual(di_cleaner.beautify_image(image), exp_image,
                          msg='Unexpected result')
 
+    def test_get_images_to_delete(self):
+        none_images = [{u'Id': u'0', u'RepoTags': [u'<none>:<none>']},
+                       {u'Id': u'1', u'RepoTags': [u'<none>:<none>']}]
+        repos = {
+            u'a': [
+                {u'Id': '4', u'Created': 4, u'RepoTags': [u'a:4']},
+                {u'Id': '3', u'Created': 3, u'RepoTags': [u'a:3']},
+                {u'Id': '2', u'Created': 2, u'RepoTags': [u'a:2']}
+            ],
+            u'b': [
+                {u'Id': '6', u'Created': 6, u'RepoTags': [u'b:6']},
+                {u'Id': '5', u'Created': 5, u'RepoTags': [u'b:5']}
+            ]
+        }
+        exp_1 = [{u'Id': '2', u'Created': 2, u'RepoTags': [u'a:2']}]
+        self.assertEqual(
+            di_cleaner.get_images_to_delete(none_images, repos, 2, True),
+            exp_1, msg='Unexpected result')
+        exp_2 = [image for image in none_images]
+        exp_2.extend(exp_1)
+        self.assertEqual(
+            di_cleaner.get_images_to_delete(none_images, repos, 2, False),
+            exp_2, msg='Unexpected result')
+
 
 if __name__ == '__main__':
     unittest.main()
