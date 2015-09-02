@@ -1,4 +1,4 @@
-# docker-image-cleaner
+# docker-image-cleaner [![Build Status](https://travis-ci.org/aebm/docker-image-cleaner.svg)](https://travis-ci.org/aebm/docker-image-cleaner)
 From all the pulled docker images remove keep only the N most recent images pulled
 
 ## Installation
