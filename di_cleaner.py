@@ -100,7 +100,7 @@ def split_images(images):
 
 
 def remove_keys_from_dict(keys, dict_):
-    return {k: v for k, v in dict_.iteritems() if k not in keys}
+    return {k: v for k, v in dict_.items() if k not in keys}
 
 
 def add_image_to_grp_images(grp_images, image):
@@ -121,7 +121,7 @@ def reverse_sort_images_created(images):
 
 
 def sort_images_in_repos(repos):
-    return {k: reverse_sort_images_created(v) for k, v in repos.iteritems()}
+    return {k: reverse_sort_images_created(v) for k, v in repos.items()}
 
 
 def beautify_image(image):
@@ -157,7 +157,7 @@ def get_images_to_delete(none_images, repos, num_images_to_keep, keep_nones):
     if not keep_nones:
         images_to_delete.extend(none_images)
     [images_to_delete.extend(repo_images[num_images_to_keep:])
-     for repo_images in repos.itervalues()
+     for repo_images in repos.values()
      if len(repo_images) > num_images_to_keep]
     return images_to_delete
 
