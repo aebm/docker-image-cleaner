@@ -28,3 +28,34 @@ From all the pulled docker images remove keep only the N most recent images pull
   $ source VIRTUALENV_NAME/bin/activate
   $ ./di_cleaner --help
   ```
+
+## Examples
+* Run and show what images it is going to delete with deleting them
+
+  ```bash
+  $ VIRTUALENV_NAME/bin/python di_cleaner.py --verbose --noop
+  ```
+  
+* Run with debug on
+
+  ```bash
+  $ VIRTUALENV_NAME/bin/python di_cleaner.py --debug
+  ```
+  
+* Delete all images except the 10 most recent ones
+  
+  ```bash
+  $ VIRTUALENV_NAME/bin/python di_cleaner.py --images-to-keep 10
+  ```
+  
+* If you want to preserve the <none> images
+
+  ```bash
+  $ VIRTUALENV_NAME/bin/python di_cleaner.py --keep-none-images
+  ```
+  
+## Tests
+Run
+```bash
+$ VIRTUALENV_NAME/bin/python -m unittest discover
+```
