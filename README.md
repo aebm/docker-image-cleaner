@@ -59,3 +59,16 @@ Run
 ```bash
 $ VIRTUALENV_NAME/bin/python -m unittest discover
 ```
+
+## Use docker image
+
+Build the image as ${IMAGE_NAME}
+```
+docker build  -t ${IMAGE_NAME} .
+```
+
+Execute the program connected to the host socket
+
+```
+docker run -v /var/run/docker.sock:/var/run/docker.sock --rm -it ${IMAGE_NAME} --help
+```
