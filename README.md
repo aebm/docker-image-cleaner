@@ -30,7 +30,7 @@ From all the pulled docker images remove keep only the N most recent images pull
   ```
 
 ## Examples
-* Run and show what images it is going to delete with deleting them
+* Run and show what images it is going to delete without deleting them
 
   ```bash
   $ VIRTUALENV_NAME/bin/python di_cleaner.py --verbose --noop
