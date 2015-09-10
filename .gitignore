@@ -55,3 +55,15 @@ docs/_build/
 
 # PyBuilder
 target/
+
+
+### vim ###
+[._]*.s[a-w][a-z]
+[._]s[a-w][a-z]
+*.un~
+Session.vim
+.netrwhist
+*~
+
+### PyCharm ###
+.idea/
