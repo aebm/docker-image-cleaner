@@ -142,10 +142,12 @@ def print_images_to_delete(images):
 
 def remove_docker_image(client, image_id, verbose):
     try:
+        if verbose:
+            print("Removing {}".format(image_id))
         client.remove_image(image_id)
     except Exception as e:
         if verbose:
-            print(e.explanation)
+            print(e)
 
 
 def delete_images(client, images, verbose):
