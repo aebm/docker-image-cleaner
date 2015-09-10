@@ -164,6 +164,35 @@ def get_images_to_delete(none_images, repos, num_images_to_keep, keep_nones):
     return images_to_delete
 
 
+def _build_docker_client(args):
+    if _is_osx_platform():
+        return _macosx_docker_client(args)
+    else:
+        return _default_docker_client(args)
+
+
+def _macosx_docker_client(args):
+    from docker.utils import kwargs_from_env
+    kwargs = kwargs_from_env()
+    # Read http://docker-py.readthedocs.org/en/latest/boot2docker/
+    kwargs['tls'].assert_hostname = False
+
+    kwargs['version'] = args.api_version
+    kwargs['timeout'] = args.http_timeout
+    return Client(**kwargs)
+
+
+def _default_docker_client(args):
+    return Client(base_url=args.base_url,
+                  version=args.api_version,
+                  timeout=args.http_timeout)
+
+
+def _is_osx_platform():
+    from sys import platform as _platform
+    return "darwin" in _platform
+
+
 def main():
     atexit.register(_exit)
     parser = setup_parser(argparse.ArgumentParser(
@@ -174,10 +203,7 @@ def main():
     debug = partial(debug_var, debug=is_debug_on())
     debug(name='args', var=args)
     validate_args(args)
-    client = Client(
-        base_url=args.base_url,
-        version=args.api_version,
-        timeout=args.http_timeout)
+    client = _build_docker_client(args)
     images = client.images()
     debug(name='images', var=images)
     non_none_images, none_images = split_images(images)

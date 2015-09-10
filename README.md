@@ -53,6 +53,18 @@ From all the pulled docker images remove keep only the N most recent images pull
   ```bash
   $ VIRTUALENV_NAME/bin/python di_cleaner.py --keep-none-images
   ```
+
+## Mac OSX
+Start up your docker-machine. 
+You need to setup the environment of your docker-machine in your shell 
+
+```bash
+$ eval "$(docker-machine env default)"
+```
+
+Note, **default** is your virtual machine name
+
+Now you can run all examples.
   
 ## Tests
 Run
