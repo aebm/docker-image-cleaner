@@ -13,7 +13,7 @@ From all the pulled docker images remove keep only the N most recent images pull
 * Install dependencies
 
   ```bash
-  $ VIRTUALENV_NAME/bin/pip install -r requeriments.txt
+  $ VIRTUALENV_NAME/bin/pip install -r requirements.txt
   ```
 
 * Run it with the same privileges as the docker client
