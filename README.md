@@ -48,7 +48,7 @@ From all the pulled docker images remove keep only the N most recent images pull
   $ VIRTUALENV_NAME/bin/python di_cleaner.py --images-to-keep 10
   ```
   
-* If you want to preserve the <none> images
+* If you want to preserve the \<none\> images
 
   ```bash
   $ VIRTUALENV_NAME/bin/python di_cleaner.py --keep-none-images
