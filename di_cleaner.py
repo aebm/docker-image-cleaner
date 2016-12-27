@@ -6,9 +6,10 @@ import logging
 import sys
 from datetime import datetime
 from functools import partial, reduce
+from itertools import groupby
 from pprint import pformat
 from operator import itemgetter
-from docker import Client
+from docker import DockerClient
 from humanfriendly import format_size
 
 DEFAULT_DOCKER_BASE_URL = 'unix://var/run/docker.sock'
@@ -88,7 +89,7 @@ def split_by_none(images_lists, image):
     if not isinstance(images_lists, tuple):
         raise TypeError('First argument should be a tuple')
     non_none_images, none_images = images_lists
-    if u'<none>:<none>' in image[u'RepoTags']:
+    if image[u'RepoTags'] is None or u'<none>:<none>' in image[u'RepoTags']:
         none_images.append(image)
     else:
         non_none_images.append(image)
@@ -104,11 +105,12 @@ def remove_keys_from_dict(keys, dict_):
 
 
 def add_image_to_grp_images(grp_images, image):
-    repo, _ = image[u'RepoTags'][0].split(':')
-    if repo in grp_images:
-        grp_images[repo].append(image)
-    else:
-        grp_images[repo] = [image]
+    repos = sorted([e.split(':')[0] for e in image[u'RepoTags']])
+    for repo, _ in groupby(repos):
+        if repo in grp_images:
+            grp_images[repo].append(image)
+        else:
+            grp_images[repo] = [image]
     return grp_images
 
 
@@ -144,7 +146,7 @@ def remove_docker_image(client, image_id, verbose):
     try:
         if verbose:
             print("Removing {}".format(image_id))
-        client.remove_image(image_id)
+        client.images.remove(image_id)
     except Exception as e:
         if verbose:
             print(e)
@@ -183,7 +185,7 @@ def _macosx_docker_client(args):
 
 
 def _default_docker_client(args):
-    return Client(base_url=args.base_url,
+    return DockerClient(base_url=args.base_url,
                   version=args.api_version,
                   timeout=args.http_timeout)
 
@@ -204,7 +206,7 @@ def main():
     debug(name='args', var=args)
     validate_args(args)
     client = _build_docker_client(args)
-    images = client.images()
+    images = [i.attrs for i in client.images.list(all=True)]
     debug(name='images', var=images)
     non_none_images, none_images = split_images(images)
     debug(name='non_none_images', var=non_none_images)

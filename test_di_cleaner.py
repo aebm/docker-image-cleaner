@@ -9,10 +9,22 @@ from humanfriendly import format_size
 class TestDockerImageCleanerMethods(unittest.TestCase):
 
     def test_split_by_none(self):
-        image_none = {'dummy': False, u'RepoTags': u'<none>:<none>'}
-        image_none_dummy = {'dummy': True, u'RepoTags': u'<none>:<none>'}
-        image_non_none = {'dummy': False, u'RepoTags': u'a:b'}
-        image_non_none_dummy = {'dummy': False, u'RepoTags': u'c:d'}
+        image_none = {'dummy': False, u'RepoTags': [u'<none>:<none>']}
+        image_none_dummy = {'dummy': True, u'RepoTags': [u'<none>:<none>']}
+        image_none_broken = {u'RepoTags': None}
+        image_non_none = {'dummy': False, u'RepoTags': [u'a:b']}
+        image_non_none_dummy = {'dummy': False, u'RepoTags': [u'c:d']}
+        non_none_images, none_images = di_cleaner.split_by_none(
+            ([], []),
+            image_none_broken)
+        self.assertIn(
+            image_none_broken,
+            none_images,
+            msg='Broken none image should be in none_images list')
+        self.assertNotIn(
+            image_none_broken,
+            non_none_images,
+            msg='Broken none image should not be in non_none_images list')
         none_images = [image_none_dummy]
         non_none_images = [image_non_none_dummy]
         non_none_images, none_images = di_cleaner.split_by_none(
@@ -53,14 +65,15 @@ class TestDockerImageCleanerMethods(unittest.TestCase):
                                       none_images), image_non_none)
 
     def test_split_images(self):
-        images = [{'id': id_, u'RepoTags': u'<none>:<none>'}
+        images = [{'id': id_, u'RepoTags': [u'<none>:<none>']}
                   for id_ in range(2)]
-        images.append({'id': 2, u'RepoTags': u'<alfa>:<omega>'})
+        images.append({'id': 2, u'RepoTags': [u'<alfa>:<omega>']})
+        images.append({'id': 3, u'RepoTags': None})
         non_none_images, none_images = di_cleaner.split_images(images)
         self.assertEqual(len(non_none_images), 1,
                          msg='non_none_images should have one element')
-        self.assertEqual(len(none_images), 2,
-                         msg='none_images should have two elements')
+        self.assertEqual(len(none_images), 3,
+                         msg='none_images should have three elements')
 
     def test_remove_keys_from_dict(self):
         dict_ = {i: i for i in range(5)}
