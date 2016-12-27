@@ -1,2 +1,2 @@
-docker-py==1.10.6
+docker==2.0.0
 humanfriendly==2.2
