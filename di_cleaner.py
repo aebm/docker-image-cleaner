@@ -142,18 +142,21 @@ def print_images_to_delete(images):
     print(pformat([beautify_image(image) for image in images]))
 
 
-def remove_docker_image(client, image_id, verbose):
+def remove_docker_image(client, image, verbose):
     try:
         if verbose:
-            print("Removing {}".format(image_id))
-        client.images.remove(image_id)
+            print("Removing {}".format(image[u'Id']))
+        if image[u'RepoTags'] is None or u'<none>:<none>' in image[u'RepoTags']:
+            client.images.remove(image[u'Id'])
+        else:
+            [client.images.remove(tag) for tag in image[u'RepoTags']]
     except Exception as e:
         if verbose:
             print(e)
 
 
 def delete_images(client, images, verbose):
-    [remove_docker_image(client, image[u'Id'], verbose) for image in images]
+    [remove_docker_image(client, image, verbose) for image in images]
 
 
 def get_images_to_delete(none_images, repos, num_images_to_keep, keep_nones):
