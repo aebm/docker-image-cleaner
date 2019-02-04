@@ -1,2 +1,2 @@
 docker==2.0.0
-humanfriendly==2.2
+humanfriendly==4.17
