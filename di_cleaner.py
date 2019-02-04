@@ -9,7 +9,7 @@ from functools import partial, reduce
 from itertools import groupby
 from pprint import pformat
 from operator import itemgetter
-from docker import DockerClient
+from docker import APIClient
 from humanfriendly import format_size
 
 DEFAULT_DOCKER_BASE_URL = 'unix://var/run/docker.sock'
@@ -147,9 +147,9 @@ def remove_docker_image(client, image, verbose):
         if verbose:
             print("Removing {}".format(image[u'Id']))
         if image[u'RepoTags'] is None or u'<none>:<none>' in image[u'RepoTags']:
-            client.images.remove(image[u'Id'])
+            client.remove_image(image[u'Id'])
         else:
-            [client.images.remove(tag) for tag in image[u'RepoTags']]
+            [client.remove_image(tag) for tag in image[u'RepoTags']]
     except Exception as e:
         if verbose:
             print(e)
@@ -184,11 +184,11 @@ def _macosx_docker_client(args):
 
     kwargs['version'] = args.api_version
     kwargs['timeout'] = args.http_timeout
-    return Client(**kwargs)
+    return APIClient(**kwargs)
 
 
 def _default_docker_client(args):
-    return DockerClient(base_url=args.base_url,
+    return APIClient(base_url=args.base_url,
                   version=args.api_version,
                   timeout=args.http_timeout)
 
@@ -209,7 +209,7 @@ def main():
     debug(name='args', var=args)
     validate_args(args)
     client = _build_docker_client(args)
-    images = [i.attrs for i in client.images.list(all=True)]
+    images = client.images(all=True)
     debug(name='images', var=images)
     non_none_images, none_images = split_images(images)
     debug(name='non_none_images', var=non_none_images)
