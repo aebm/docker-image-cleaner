@@ -1,4 +1,9 @@
-# docker-image-cleaner [![Build Status](https://travis-ci.org/aebm/docker-image-cleaner.svg)](https://travis-ci.org/aebm/docker-image-cleaner)
+# docker-image-cleaner
+[![CI](https://github.com/aleasoluciones/docker-image-cleaner/actions/workflows/ci.yml/badge.svg)](https://github.com/aleasoluciones/docker-image-cleaner/actions/workflows/ci.yml)
+![Python versions supported](https://img.shields.io/badge/supports%20python-2.7%20|%203.7-blue.svg)
+
+
+
 From all the pulled docker images remove keep only the N most recent images pulled
 
 ## Installation
