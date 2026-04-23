@@ -1,0 +1,11 @@
+#!/bin/bash
+
+set -e
+
+COMMAND=/usr/local/sbin/docker-image-cleaner
+
+echo "Fix perms"
+chmod 0500 ${COMMAND}
+echo "Fix owner"
+chown root:root ${COMMAND}
+exit 0

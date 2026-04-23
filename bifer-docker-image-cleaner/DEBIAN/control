@@ -1,0 +1,7 @@
+Package: bifer-docker-image-cleaner
+Version: 1.0
+Section: custom
+Priority: optional
+Architecture: all
+Maintainer: Bifer Team <bifer@alea-soluciones.com>
+Description: Daemon to remove old Docker images keeping the most recent ones.

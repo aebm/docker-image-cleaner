@@ -1,91 +1,82 @@
 # docker-image-cleaner
+
 [![CI](https://github.com/aleasoluciones/docker-image-cleaner/actions/workflows/ci.yml/badge.svg)](https://github.com/aleasoluciones/docker-image-cleaner/actions/workflows/ci.yml)
-![Python versions supported](https://img.shields.io/badge/supports%20python-2.7%20|%203.7-blue.svg)
 
-
-
-From all the pulled docker images remove keep only the N most recent images pulled
+Daemon that removes old Docker images, keeping only the N most recent per repository.
 
 ## Installation
-* Clone repo
-* It is adviced to use a virtualenv
-* To setup a virtualenv
 
-  ```bash
-  $ virtualenv --clear --always-copy VIRTUALENV_NAME
-  ```
+### From .deb package
+```bash
+sudo dpkg -i bifer-docker-image-cleaner_*.deb
+sudo systemctl enable docker-image-cleaner
+sudo systemctl start docker-image-cleaner
+```
 
-* Install dependencies
-
-  ```bash
-  $ VIRTUALENV_NAME/bin/pip install -r requirements.txt
-  ```
-
-* Run it with the same privileges as the docker client
-
-  ```bash
-  $ VIRTUALENV_NAME/bin/python di_cleaner.py --help
-  ```
-  
-* Another way
-
-  ```bash
-  $ source VIRTUALENV_NAME/bin/activate
-  $ ./di_cleaner --help
-  ```
+### From binary
+```bash
+./docker-image-cleaner --help
+```
 
 ## Examples
-* Run and show what images it is going to delete without deleting them
 
-  ```bash
-  $ VIRTUALENV_NAME/bin/python di_cleaner.py --verbose --noop
-  ```
-  
-* Run with debug on
+### Dry run (preview what will be deleted)
+```bash
+./docker-image-cleaner --oneshot --noop -v
+```
 
-  ```bash
-  $ VIRTUALENV_NAME/bin/python di_cleaner.py --debug
-  ```
-  
-* Delete all images except the 10 most recent ones
-  
-  ```bash
-  $ VIRTUALENV_NAME/bin/python di_cleaner.py --images-to-keep 10
-  ```
-  
-* If you want to preserve the \<none\> images
+### Delete all except the 5 most recent per repo
+```bash
+./docker-image-cleaner --oneshot -images-to-keep 5
+```
 
-  ```bash
-  $ VIRTUALENV_NAME/bin/python di_cleaner.py --keep-none-images
-  ```
+### Keep `<none>` dangling images
+```bash
+./docker-image-cleaner --oneshot --keep-none-images
+```
 
-## Mac OSX
-Start up your docker-machine. 
-You need to setup the environment of your docker-machine in your shell 
+### Daemon mode (runs every 10 minutes)
+```bash
+./docker-image-cleaner -images-to-keep 2 --sleepDuration 10m
+```
+
+### Force delete (for images used by containers)
+```bash
+./docker-image-cleaner --oneshot --force
+```
+
+## Flags
+
+| Flag | Default | Description |
+|------|---------|--------------|
+| `--oneshot` | false | Run once and exit (daemon mode by default) |
+| `--images-to-keep` | 2 | Number of images to keep per repository |
+| `--keep-none-images` | false | Keep `<none>` dangling images |
+| `--force` / `-f` | false | Force delete (for images used by containers) |
+| `--sleepDuration` | 5m | Time between runs (daemon mode) |
+| `--debug` / `-d` | false | Debug logging |
+| `--quiet` / `-q` | false | Suppress info messages |
+| `-v` | false | Verbose output |
+
+## Systemd Service
+
+After installation, enable and start the service:
 
 ```bash
-$ eval "$(docker-machine env default)"
+sudo systemctl enable docker-image-cleaner
+sudo systemctl start docker-image-cleaner
+sudo systemctl status docker-image-cleaner
 ```
 
-Note, **default** is your virtual machine name
+## Development
 
-Now you can run all examples.
-  
-## Tests
-Run
 ```bash
-$ VIRTUALENV_NAME/bin/python -m unittest discover
-```
+# Check code (fmt, vet, staticcheck)
+make check
 
-## Use docker image
+# Compile
+make compile
 
-Build the image as ${IMAGE_NAME}
-```
-docker build  -t ${IMAGE_NAME} .
-```
-
-Execute the program connected to the host socket
-
-```
-docker run -v /var/run/docker.sock:/var/run/docker.sock --rm -it ${IMAGE_NAME} --help
+# Build .deb package
+make package
 ```
