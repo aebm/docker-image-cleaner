@@ -211,6 +211,24 @@ func removeImageTag(ctx context.Context, l logger, dockerCli *client.Client, tag
 	return nil
 }
 
+// removeImageByID removes an image by its ID, with optional force and error handling for already-deleted images
+func removeImageByID(ctx context.Context, l logger, dockerCli *client.Client, imageID string, force bool) error {
+	l.logDebug(fmt.Sprintf("Removing image by ID: %s", imageID))
+	_, err := dockerCli.ImageRemove(ctx, imageID, types.ImageRemoveOptions{
+		Force: force,
+	})
+	if err != nil {
+		// Ignore errors for images that were already deleted (e.g., via tag removal)
+		if strings.Contains(err.Error(), "No such image") || strings.Contains(err.Error(), "not found") {
+			l.logDebug(fmt.Sprintf("Image %s already deleted, ignoring error: %v", imageID, err))
+			return nil
+		}
+		l.log(fmt.Sprintf("Error removing image by ID %s: %v", imageID, err))
+		return err
+	}
+	return nil
+}
+
 func deleteImageGroup(ctx context.Context, l logger, noop bool, force bool, dockerCli *client.Client, img ImageGroup) error {
 	if noop {
 		l.log(fmt.Sprintf("Would delete image %s: %v", img.ID, img.RepoTags))
@@ -219,17 +237,30 @@ func deleteImageGroup(ctx context.Context, l logger, noop bool, force bool, dock
 
 	l.log(fmt.Sprintf("Deleting image %s: %v", img.ID, img.RepoTags))
 
-	// Delete each tag one by one. When the last tag is removed,
-	// Docker will automatically delete the image itself.
+	// Case 1: Dangling images (no tags) - remove directly by ID
+	if len(img.RepoTags) == 0 {
+		l.logDebug(fmt.Sprintf("No tags found for image %s, removing by ID", img.ID))
+		return removeImageByID(ctx, l, dockerCli, img.ID, force)
+	}
+
+	// Case 2: Images with tags - remove tags first, fallback to ID if needed
+	allTagsRemoved := true
 	for _, tag := range img.RepoTags {
-		err := removeImageTag(ctx, l, dockerCli, tag, false)
+		err := removeImageTag(ctx, l, dockerCli, tag, force) // Pass force flag here
 		if err != nil {
-			// Continue with other tags even if one fails
+			allTagsRemoved = false
 			l.logDebug(fmt.Sprintf("Error removing tag %s: %v (continuing with other tags)", tag, err))
 		}
 	}
 
-	return nil
+	// If all tags were removed successfully, the image should be deleted
+	if allTagsRemoved {
+		return nil
+	}
+
+	// Fallback: Tag removal failed for some tags, try removing by ID
+	l.logDebug(fmt.Sprintf("Tag removal incomplete for image %s, falling back to ID removal", img.ID))
+	return removeImageByID(ctx, l, dockerCli, img.ID, force)
 }
 
 func deleteImages(ctx context.Context, l logger, noop bool, force bool, dockerCli *client.Client, images []ImageGroup) (int, int) {
